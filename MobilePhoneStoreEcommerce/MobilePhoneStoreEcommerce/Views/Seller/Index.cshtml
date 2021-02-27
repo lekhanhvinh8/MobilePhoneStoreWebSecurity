@@ -1,0 +1,700 @@
+﻿@{ 
+    Layout = null;
+}
+@using MobilePhoneStoreEcommerce.Persistence.Consts
+@model MobilePhoneStoreEcommerce.Core.ViewModels.ProductForSellerViewModel
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="~/Content/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/dataTables.bootstrap.min.css" />
+	<link rel="stylesheet" href="~/Content/Seller.css" type="text/css" />
+	<title>Mobile Store - Seller Index</title>
+</head>
+
+<body>
+    <header>
+        <div class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    @Html.ActionLink("Home", "Index", "HomeScreen", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Seller", "Index", "Seller", new { sellerID = Model.SellerID }, new { @class = "navbar-brand" })
+                </div>
+                <div class="navbar-collapse collapse">
+                    <div class="nav navbar-nav navbar-right">
+                        <img src="~/Content/resources/images/adminIcon.png" style="height: 50px;" />
+						<ul class="nav navbar-nav navbar-right">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
+								<ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("My Profile", "SellerInfo", "Customer", routeValues: new { sellerID = Model.SellerID }, htmlAttributes: new { id = "info" })</li>
+                                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Account", routeValues: new { ID = Model.SellerID }, htmlAttributes: new { id = "changPassLink" })</li>
+									<li>@Html.ActionLink("Log out", "Logout", "Account", routeValues: new { sessionName = SessionNames.SellerID }, htmlAttributes: new { id = "logoutLink" })</li>
+								</ul>
+							</li>
+						</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" id="product-management-tab" data-toggle="tab" href="#product-management-area" role="tab">Product Management</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="order-management-tab" data-toggle="tab" href="#order-management-area" role="tab">Order Management</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="shipping-management-tab" data-toggle="tab" href="#shipping-management-area" role="tab">Shipping Management</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane" id="product-management-area" role="tabpanel">
+                <br />
+                <a href="/Seller/AddNewProduct?sellerID=@Model.SellerID" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    Add New Product
+                </a>
+                <br />
+                <br />
+
+                <div>
+                    <table id="table-products" class="table table-bordered">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane" id="order-management-area" role="tabpanel">
+                <br />
+                <div>
+                    <table id="table-orders" class="table table-bordered">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="shipping-management-area" role="tabpanel">
+                <br />
+                <div>
+                    <table id="table-shipping-orders" class="table table-bordered">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dialog-order-detail" style="display:none;">
+        <form id="form-order-detail">
+            <div class="form-inline">
+                <label class="control-label" for="orderStatus">Order Status: </label>
+                <input class="form-control" name="orderStatus" disabled />
+            </div>
+            <div class="form-group">
+                <table class="table table-hover" name="table-products">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="form-inline">
+                <label class="control-label" for="customerID">Customer ID: </label>
+                <input class="form-control" name="customerID" style="margin-left:50px;" disabled />
+            </div>
+            <div class="form-inline">
+                <label class="control-label" for="phoneNumber">Phone Number: </label>
+                <input class="form-control" name="phoneNumber" style="margin-left:34px;" disabled />
+            </div>
+            <div class="form-inline">
+                <label class="control-label" for="deliveryAddress">Delivery Address: </label>
+                <input class="form-control" name="deliveryAddress" style="margin-left:20px;" disabled />
+            </div>
+
+            <div class="form-inline">
+                <label class="control-label" for="sellerName">Seller Name: </label>
+                <input class="form-control" name="sellerName" style="margin-left:53px;" disabled />
+            </div>
+            <div class="form-inline">
+                <label class="control-label" for="deliveryDate">Delivery Date: </label>
+                <input class="form-control" name="deliveryDate" style="margin-left:45px;" disabled />
+            </div>
+            <div class="form-inline">
+                <label class="control-label" for="shippingCost">Shipping Cost: </label>
+                <input class="form-control" name="shippingCost" style="margin-left:39px;" disabled />
+            </div>
+            <div class="form-inline" style="float: right;">
+                <label class="control-label" for="totalCostLabel">Total Cost: </label>
+                <div name="totalCost" style="float: right;"></div>
+            </div>
+        </form>
+    </div>
+
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/bootbox.js"></script>
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#myTab a[href="#product-management-area"]').tab('show')
+
+            var tableProducts = $("#table-products").DataTable({
+                ajax: {
+                    url: "/api/ProductForSellers/GetAll?sellerID=" + @Model.SellerID,
+                    dataSrc: "",
+                },
+                "sScrollY": "355",
+                "bScrollCollapse": true,
+                columns: [
+                    {
+                        title: "Name",
+                        data: "name",
+                        width: "20%",
+                        render: function (data) {
+                            return data;
+                        },
+
+                    },
+                    {
+                        title: "Image",
+                        data: "productID",
+                        width: "11%",
+                        render: function (data) {
+                            var markup = "<img id='avatar-preview' class='img-thumbnail' style='width: 100px; height: 100px; object-fit: cover' src='/api/AvatarOfProducts/Get?productID=" + data + "'/>";
+
+                            return markup;
+                        },
+                    },
+                    {
+                        title: "Mode",
+                        data: "status",
+                        width: "5%",
+                        render: function (data, type, product) {
+
+                            var isChecked = "checked";
+
+                            if (product.status == false)
+                                isChecked = "";
+
+                            var markup =
+                                "<label class='switch'>"
+                                + "<input type='checkbox' class='success check-status' " + isChecked + " data-product-id=" + product.productID + ">"
+                                + "<span class='slider round'></span>"
+                                + "</label>";
+
+                            return markup;
+                        },
+                    },
+                    {
+                        title: "Producer",
+                        data: "producerName",
+                        width: "5%",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Category",
+                        data: "categoryName",
+                        width: "5%",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Quantity",
+                        data: "quantity",
+                        width: "7%",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Price",
+                        width: "7%",
+                        data: "price",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Modify",
+                        data: "productID",
+                        render: function (data) {
+                            var markup = "<button class='btn btn-primary js-modify' data-product-id=" + data + ">"
+                                + "<span class='glyphicon glyphicon-eye-open' aria-hidden='true'></span>"
+                                + "Modify</button>";
+                            return markup;
+                        },
+                    },
+                ],
+
+            });
+
+            var tableOrders = $("#table-orders").DataTable({
+                ajax: {
+                    url: "/api/Orders/GetAll?sellerID=" + @Model.SellerID + "&status=" + @OrderStates.Pending,
+                    dataSrc: "",
+                },
+                "sScrollY": "355",
+                "bScrollCollapse": true,
+                columns: [
+                    {
+                        title: "Order's ID",
+                        data: "orderID",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Customer's ID",
+                        data: "customerID",
+                        render: function (data) {
+                            return data;
+                        }
+                    },
+                    {
+                        title: "Order's Time",
+                        data: "orderTime",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Total Cost",
+                        data: "totalOrderCost",
+                        render: function (data, type, orderDto) {
+                            return "<span>" + standardizedMoneyFormatVND(data + orderDto.shippingCost) + " VND</span>";
+                        },
+                    },
+                    {
+                        title: "Delivery Address",
+                        data: "deliveryAddress",
+                        render: function (data) {
+                            return "<span>" + data + "</span>";
+                        },
+                    },
+                    {
+                        title: "See details",
+                        data: "orderID",
+                        render: function (data) {
+                            return "<button class='btn-link jsDetail' data-orderID=" + data + ">Details</button>";
+                        },
+                    },
+                    {
+                        title: "Confirm",
+                        data: "orderID",
+                        render: function (data) {
+                            return "<button class='btn btn-success jsConfirm' data-orderID=" + data + ">Confirm</button>";
+                        }
+                    },
+                    {
+                        title: "Cancel",
+                        data: "orderID",
+                        render: function (data) {
+                            return "<button class='btn btn-danger jsCancel' data-orderID=" + data + ">Cancel</button>";
+                        }
+                    }
+                ],
+                searching: false,
+                info: false,
+                ordering: false,
+
+            });
+
+            var tableShippingOrders = $("#table-shipping-orders").DataTable({
+                ajax: {
+                    url: "/api/Orders/GetAllShippingOrder?sellerID=" + @Model.SellerID,
+                    dataSrc: "",
+                },
+                "sScrollY": "355",
+                "bScrollCollapse": true,
+                columns: [
+                    {
+                        title: "Order's ID",
+                        data: "orderID",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Customer's ID",
+                        data: "customerID",
+                        render: function (data) {
+                            return data;
+                        }
+                    },
+                    {
+                        title: "Order's Time",
+                        data: "orderTime",
+                        render: function (data) {
+                            return data;
+                        },
+                    },
+                    {
+                        title: "Total Cost",
+                        data: "totalOrderCost",
+                        render: function (data, type, orderDto) {
+                            return "<span>" + standardizedMoneyFormatVND(data + orderDto.shippingCost) + " VND</span>";
+                        },
+                    },
+                    {
+                        title: "Delivery Address",
+                        data: "deliveryAddress",
+                        render: function (data) {
+                            return "<span>" + data + "</span>";
+                        },
+                    },
+                    {
+                        title: "See details",
+                        data: "orderID",
+                        render: function (data) {
+                            return "<button class='btn-link jsDetail' data-orderID=" + data + ">Details</button>";
+                        },
+                    },
+                    {
+                        title: "Status",
+                        data: "status",
+                        render: function (data) {
+                            if (data == @OrderStates.Success)
+                                return "<span>Success</span>";
+
+                            if(data == @OrderStates.Paid)
+                                return "<span>Paid</span>";
+
+                            return "<span>Unpaid</span>";
+                        },
+                    },
+                    {
+                        title: "Delivery",
+                        data: "orderID",
+                        render: function (data, type, orderDto) {
+                            if (orderDto.status == @OrderStates.Paid)
+                                return "<button class='btn btn-success jsDelivery' data-orderID=" + data + ">Delivery</button>";
+
+                            return "<button disabled class='btn btn-success' data-orderID=" + data + ">Delivery</button>";
+                        }
+                    },
+                    {
+                        title: "Cancel",
+                        data: "orderID",
+                        render: function (data, type, orderDto) {
+                            if (canCancel(orderDto))
+                                return "<button class='btn btn-danger jsCancel' data-orderID=" + data + ">Cancel</button>";
+
+                            return "<button disabled class='btn btn-danger' data-orderID=" + data + ">Cancel</button>";
+                        }
+                    }
+
+                ],
+                searching: false,
+                info: false,
+                ordering: false,
+
+            });
+
+            $("#myTab a[href='#order-management-area']").on('click', function (e) {
+                tableOrders.ajax.reload();
+            })
+            $("#myTab a[href='#product-management-area']").on('click', function (e) {
+                tableProducts.ajax.reload();
+            })
+            $("#myTab a[href='#shipping-management-area']").on('click', function (e) {
+                tableShippingOrders.ajax.reload();
+            })
+
+
+            $("#table-products").on("click", ".check-status", function () {
+                var checkbox = $(this);
+
+                var status = false;
+
+                if (checkbox.is(':checked')) {
+                    status = true;
+                }
+
+                $.ajax({
+                    url: "/api/ProductForSellers/ModifyStatus?productID=" + checkbox.attr("data-product-id") + "&status=" + status,
+                    method: "Get",
+                });
+
+            });
+
+            $("#table-products").on("click", ".js-modify", function () {
+                window.location.href = '/Seller/UpdateProduct?productID=' + $(this).attr("data-product-id") + '&sellerID=' + @Model.SellerID;
+            });
+
+            $("#table-orders").on("click", ".jsConfirm", function () {
+                var buttonConfirm = $(this);
+
+                $.ajax({
+                    url: "/api/Orders/Get?orderID=" + buttonConfirm.attr("data-orderid"),
+                    method: "Get",
+                    success: function (response) {
+                        if (response.status != @OrderStates.Pending) {
+                            bootbox.alert("This order has been canceled");
+                            tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                        }
+                        else {
+                            $.ajax({
+                                url: "/api/Orders/ConfirmOrder?orderID=" + buttonConfirm.attr("data-orderid"),
+                                method: "Get",
+                                success: function () {
+                                    tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                                },
+                            });
+                        }
+                    }
+                })
+
+            });
+
+            $("#table-orders").on("click", ".jsCancel", function () {
+                var buttonConfirm = $(this);
+
+                $.ajax({
+                    url: "/api/Orders/Get?orderID=" + buttonConfirm.attr("data-orderid"),
+                    method: "Get",
+                    success: function (response) {
+                        if (response.status != @OrderStates.Pending) {
+                            bootbox.alert("This order has been canceled");
+                            tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                        }
+                        else {
+                            $.ajax({
+                                url: "/api/Orders/CancelOrder?orderID=" + buttonConfirm.attr("data-orderid"),
+                                method: "Get",
+                                success: function () {
+                                    tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                                },
+                            });
+                        }
+                    }
+                })
+
+            });
+
+            $("#table-shipping-orders").on("click", ".jsCancel", function () {
+                var buttonConfirm = $(this);
+
+                $.ajax({
+                    url: "/api/Orders/Get?orderID=" + buttonConfirm.attr("data-orderid"),
+                    method: "Get",
+                    success: function (response) {
+                        if (response.status != @OrderStates.Pending) {
+                            bootbox.alert("This order has been canceled");
+                            tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                        }
+                        else {
+                            $.ajax({
+                                url: "/api/Orders/CancelOrder?orderID=" + buttonConfirm.attr("data-orderid"),
+                                method: "Get",
+                                success: function () {
+                                    tableOrders.row(buttonConfirm.parents("tr")).remove().draw();
+                                },
+                            });
+                        }
+                    }
+                })
+
+            });
+
+            $("#table-shipping-orders").on("click", ".jsDelivery", function () {
+                var buttonDelivery = $(this);
+
+                $.ajax({
+                    url: "/api/Orders/Delivery?orderID=" + buttonDelivery.attr("data-orderid"),
+                    method: "Get",
+                    success: function () {
+                        var newData = tableShippingOrders.row(buttonDelivery.parents("tr")).data();
+
+                        newData.status = @OrderStates.Success;
+
+                        tableShippingOrders.row(buttonDelivery.parents("tr")).data(newData).draw();
+                    }
+                })
+
+            });
+
+            $("#table-shipping-orders").on("click", ".jsDetail", function () {
+                var button = $(this);
+                CreateBootboxOrderDetail(button.attr("data-orderID"));
+
+            });
+
+            $("#table-orders").on("click", ".jsDetail", function () {
+                var button = $(this);
+                CreateBootboxOrderDetail(button.attr("data-orderID"));
+
+            });
+
+            function standardizedMoneyFormatVND(money) {
+                if ((typeof money) != "string")
+                    money = money.toString();
+
+                var standardMoney = "";
+                var countTo3 = 1;
+
+                for (var i = money.length - 1; i >= 0; i--) {
+                    if (countTo3 < 4) {
+                        standardMoney += money[i];
+                    } else {
+                        countTo3 = 1;
+                        standardMoney += ".";
+                        standardMoney += money[i];
+                    }
+                    countTo3 += 1;
+                }
+                return standardMoney.split("").reverse().join("");
+            }
+
+            function canCancel(orderDto) {
+                var deliveryDate = new Date(orderDto.deliveryDate);
+                var now = new Date();
+
+                if (orderDto.status == @OrderStates.Paid || now <= deliveryDate || orderDto.status == @OrderStates.Success)
+                    return false;
+
+                return true;
+            }
+
+            function CreateBootboxOrderDetail(orderID) {
+                $.ajax({
+                    url: "/api/Orders/Get?orderID=" + orderID,
+                    method: "Get",
+                    async: false,
+                    success: function (orderDto) {
+                        var dialogBootbox = bootbox.dialog({
+                            message: $("#dialog-order-detail").html(),
+                            title: "Order Detail",
+                            //size: "large",
+                            buttons: [
+                                {
+                                    label: "Cancel",
+                                    className: "btn btn-danger",
+                                    callback: function () {
+                                    },
+                                },
+                            ],
+                        });
+
+                        var orderState = dialogBootbox.find("#form-order-detail input[name='orderStatus']");
+                        if (orderDto.status == @OrderStates.Pending)
+                            $(orderState).val("Pending");
+                        else if (orderDto.status == @OrderStates.Canceled)
+                            $(orderState).val("Canceled");
+                        else if (orderDto.status == @OrderStates.Confirmed)
+                            $(orderState).val("Confirm");
+                        else if (orderDto.status == @OrderStates.Paid)
+                            $(orderState).val("Paid");
+                        else if (orderDto.status == @OrderStates.Success)
+                            $(orderState).val("Success");
+
+                        var tableProducts = dialogBootbox.find("#form-order-detail table[name='table-products']");
+
+                        $(tableProducts).DataTable({
+                            data: orderDto.productOfOrderDtos,
+                            columns: [
+                                {
+                                    title: "Image",
+                                    data: "productID",
+                                    render: function (data) {
+                                        var markup = "<img id='avatar-preview' class='img-thumbnail' style='width: 100px; height: 100px; object-fit: cover' src='/api/AvatarOfProducts/Get?productID=" + data + "'/>";
+
+                                        return markup;
+                                    }
+                                },
+                                {
+                                    title: "Name",
+                                    data: "productName",
+                                    render: function (data, type, productsOfOrderDto) {
+                                        var markup = "";
+                                        markup += "<div>" + "<a href='HomeScreen/Details?id=" + productsOfOrderDto.productID + "'>" + data + "</a>" + "</div>";
+                                        return markup;
+                                    }
+                                },
+                                {
+                                    title: "Unit Price",
+                                    data: "unitPrice",
+                                    render: function (data) {
+                                        return "<span>" + standardizedMoneyFormatVND(data) + " VND</span>";
+                                    },
+                                },
+                                {
+                                    title: "Quantity",
+                                    data: "amount",
+                                    render: function (data) {
+                                        return "<span>x" + data + "</span>";
+                                    },
+                                },
+                                {
+                                    title: "Amount",
+                                    data: "orderID",
+                                    render: function (data, type, productsOfOrderDto) {
+                                        return "<span>" + standardizedMoneyFormatVND(productsOfOrderDto.unitPrice * productsOfOrderDto.amount) + " VND</span>";
+                                    },
+                                },
+                            ],
+                            searching: false,
+                            info: false,
+                            ordering: false,
+                            paging: false,
+                        });
+
+                        var customerID = dialogBootbox.find("#form-order-detail input[name='customerID']");
+                        var phoneNumber = dialogBootbox.find("#form-order-detail input[name='phoneNumber']");
+                        var deliveryAddress = dialogBootbox.find("#form-order-detail input[name='deliveryAddress']");
+                        var sellerName = dialogBootbox.find("#form-order-detail input[name='sellerName']");
+                        var deliveryDate = dialogBootbox.find("#form-order-detail input[name='deliveryDate']");
+                        var shippingCost = dialogBootbox.find("#form-order-detail input[name='shippingCost']");
+
+                        $(customerID).val(orderDto.customerID);
+                        $(phoneNumber).val(orderDto.phoneNumber);
+                        $(deliveryAddress).val(orderDto.deliveryAddress);
+                        $(sellerName).val(orderDto.sellerName);
+                        $(deliveryDate).val(orderDto.deliveryDate);
+                        $(shippingCost).val(orderDto.shippingCost);
+
+                        var totalCost = dialogBootbox.find("#form-order-detail div[name='totalCost']");
+                        totalCost.text(" " + standardizedMoneyFormatVND(orderDto.shippingCost + orderDto.totalOrderCost) + " VND");
+
+
+                    }
+                });
+            }
+
+            function standardizedMoneyFormatVND(money) {
+                money = money.toString();
+
+                var standardMoney = "";
+                var countTo3 = 1;
+
+                for (var i = money.length - 1; i >= 0; i--) {
+                    if (countTo3 < 4) {
+                        standardMoney += money[i];
+                    } else {
+                        countTo3 = 1;
+                        standardMoney += ".";
+                        standardMoney += money[i];
+                    }
+                    countTo3 += 1;
+                }
+
+                return standardMoney.split("").reverse().join("")
+            }
+        });
+
+    </script>
+</body>
+</html>
