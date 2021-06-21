@@ -7,6 +7,10 @@ namespace MobilePhoneStoreEcommerce.Core.Domain
         public string PasswordHash { get; set; }
         public int RoleID { get; set; }
 
+        public int NumberError { get; set; }
+
+        public bool Status { get; set; }
+
         public virtual Role Role { get; set; }
         public virtual Customer Customer { get; set; }
         public virtual Seller Seller { get; set; }

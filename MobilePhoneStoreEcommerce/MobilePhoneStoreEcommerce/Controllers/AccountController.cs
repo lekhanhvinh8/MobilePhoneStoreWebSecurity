@@ -34,39 +34,67 @@ namespace MobilePhoneStoreEcommerce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("Login", loginViewModel);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return View("Login", loginViewModel);
+            //}
 
             var acc = loginViewModel.AccountDto;
 
             var result = Login(acc.Username, acc.Password);
 
-            if (result == 0) // Invalid user name or password
-                return View(loginViewModel);
-
             var accInDb = _context.Accounts.SingleOrDefault(a => a.UserName == acc.Username);
 
-            if (accInDb == null)
-                throw new Exception("Not found");
+            if (result == 0) // Invalid user name or password
+            {
+                if (accInDb == null)
+                    throw new Exception("Not found");
 
-            if (result == RoleIds.Admin)
-            {
-                Session[SessionNames.AdminID] = accInDb.ID;
-                return RedirectToAction("Index", "Admin");
-            }
-            else if (result == RoleIds.Seller)
-            {
-                Session[SessionNames.SellerID] = accInDb.ID;
-                return RedirectToAction("Index", "Seller", new { sellerID = Session[SessionNames.SellerID] });
-            }
-            else if (result == RoleIds.Customer)
-            {
-                Session[SessionNames.CustomerID] = accInDb.ID;
-                return RedirectToAction("Index", "HomeScreen");
-            }
+                accInDb.NumberError++;
 
+                if (accInDb.NumberError >= 5)
+                {
+                    accInDb.Status = false;
+                }
+
+                if (new AccountModels().UpdateAccount(accInDb))
+                {
+                    if(!accInDb.Status)
+                    {
+                        return RedirectToAction("Index", "Error");
+                    }
+                    return View(loginViewModel);
+                }
+
+                return View(loginViewModel);
+            }
+            else
+            {
+                if (accInDb == null)
+                    throw new Exception("Not found");
+
+                accInDb.NumberError = 0;
+                if (new AccountModels().UpdateAccount(accInDb))
+                {
+
+                    if (result == RoleIds.Admin)
+                    {
+                        Session[SessionNames.AdminID] = accInDb.ID;
+                        return RedirectToAction("Index", "Admin");
+                    }
+                    else if (result == RoleIds.Seller)
+                    {
+                        Session[SessionNames.SellerID] = accInDb.ID;
+                        return RedirectToAction("Index", "Seller", new { sellerID = Session[SessionNames.SellerID] });
+                    }
+                    else if (result == RoleIds.Customer)
+                    {
+                        Session[SessionNames.CustomerID] = accInDb.ID;
+                        return RedirectToAction("Index", "HomeScreen");
+                    }
+                }
+            }
+                
             return View(loginViewModel);
         }
 
@@ -102,7 +130,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
         private int Login(string username, string password)
         {
             string pwd = AccountModels.Encrypt(password, true);
-            var account = _context.Accounts.SingleOrDefault(r => r.UserName == username && r.PasswordHash == pwd);
+            var account = _context.Accounts.SingleOrDefault(r => r.UserName == username && r.PasswordHash == pwd && r.Status==true);
             var res = 0;
             if (account != null)
             {
@@ -126,6 +154,8 @@ namespace MobilePhoneStoreEcommerce.Controllers
                 newAcc.UserName = username;
                 newAcc.PasswordHash = pwd;
                 newAcc.RoleID = accType;
+                newAcc.Status = true;
+                newAcc.NumberError = 0;
                 if (new AccountModels().AddAcc(newAcc))
                 {
                     if(accType == RoleIds.Seller)
@@ -234,7 +264,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
                     if (pwd == acc.PasswordHash)
                     {
                         acc.PasswordHash = AccountModels.Encrypt(changePasswordViewModels.NewPassword, true);
-                        if (new AccountModels().UpdatePassword(acc)) 
+                        if (new AccountModels().UpdateAccount(acc)) 
                         {
                             ViewBag.ChangPass = true;
                         }
@@ -274,7 +304,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
                 else
                 {
                     findMail.Account.PasswordHash = pwd;
-                    if (new AccountModels().UpdatePassword(findMail.Account))
+                    if (new AccountModels().UpdateAccount(findMail.Account))
                     {
                         var sendMail = SendMail(forgotPasswordViewModels.Email, subject, content);
                         ViewBag.Success = true;
@@ -292,7 +322,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
                 else
                 {
                     findMail.Account.PasswordHash = pwd;
-                    if (new AccountModels().UpdatePassword(findMail.Account))
+                    if (new AccountModels().UpdateAccount(findMail.Account))
                     {
                         var sendMail = SendMail(forgotPasswordViewModels.Email, subject, content);
                         ViewBag.Success = true;

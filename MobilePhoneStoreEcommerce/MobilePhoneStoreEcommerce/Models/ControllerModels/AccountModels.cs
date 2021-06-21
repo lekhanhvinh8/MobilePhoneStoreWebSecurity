@@ -115,17 +115,30 @@ namespace MobilePhoneStoreEcommerce.Models.ControllerModels
             }
         }
 
-        public bool UpdatePassword(Account Acc)
+        public bool UpdateAccount(Account Acc)
         {
             try
             {                
-                _context.Accounts.AddOrUpdate(Acc);
+                _context.Accounts.AddOrUpdate(Acc);  
                 _context.SaveChanges();
                 return true;
             }
             catch
             {
                 return false;
+            }
+        }
+
+        public void UpdateAcc(Account Acc)
+        {
+            try
+            {
+                _context.Accounts.AddOrUpdate(Acc);
+                _context.SaveChanges();          
+            }
+            catch
+            {
+                
             }
         }
     }

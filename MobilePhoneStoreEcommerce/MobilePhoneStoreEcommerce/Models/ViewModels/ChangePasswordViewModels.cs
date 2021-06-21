@@ -14,7 +14,10 @@ namespace MobilePhoneStoreEcommerce.Models.ViewModels
         public string OldPassword { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        //[StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [RegularExpression("^(?=.*?[A - Z])(?=.*?[a - z])(?=.*?[0 - 9])(?=.*?[#?!@$%^&*-]).{8,}$",
+            ErrorMessage = "Password must be between 8 and 20 characters and contain one uppercase letter," +
+                           " one lowercase letter, one digit and one special character.")]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
