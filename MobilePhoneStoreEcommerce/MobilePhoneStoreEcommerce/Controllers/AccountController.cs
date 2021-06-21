@@ -24,6 +24,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
             _context = new ApplicationDbContext();
         }
 
+
         public ActionResult Login(int roleID = RoleIds.Unknown)
         {
             var loginViewModel = new LoginViewModel() { AccountDto = new AccountDto(), RoleID = roleID };
@@ -48,7 +49,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
             if (result == 0) // Invalid user name or password
             {
                 if (accInDb == null)
-                    throw new Exception("Not found");
+                    return View(loginViewModel);
 
                 accInDb.NumberError++;
 
@@ -71,7 +72,7 @@ namespace MobilePhoneStoreEcommerce.Controllers
             else
             {
                 if (accInDb == null)
-                    throw new Exception("Not found");
+                    return View(loginViewModel);
 
                 accInDb.NumberError = 0;
                 if (new AccountModels().UpdateAccount(accInDb))

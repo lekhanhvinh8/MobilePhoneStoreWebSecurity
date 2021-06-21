@@ -279,6 +279,10 @@
     <Compile Include="Migrations\202106201509205_UpdateDomain.designer.cs">
       <DependentUpon>202106201509205_UpdateDomain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202106210652014_Modify data.cs" />
+    <Compile Include="Migrations\202106210652014_Modify data.designer.cs">
+      <DependentUpon>202106210652014_Modify data.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ConfigurationPaypal.cs" />
     <Compile Include="Models\ControllerModels\AccountModels.cs" />
@@ -712,6 +716,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106201509205_UpdateDomain.resx">
       <DependentUpon>202106201509205_UpdateDomain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106210652014_Modify data.resx">
+      <DependentUpon>202106210652014_Modify data.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

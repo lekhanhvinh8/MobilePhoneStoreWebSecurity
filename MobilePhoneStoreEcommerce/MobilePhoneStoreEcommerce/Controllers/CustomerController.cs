@@ -18,6 +18,8 @@ namespace MobilePhoneStoreEcommerce.Controllers
             var customerViewModel = new CustomerViewModel() { customerID = customerID };
             return View(customerViewModel);
         }
+
+        [ValidateAntiForgeryToken]
         public ActionResult Info(int customerID)
         {
             ViewBag.Info = "Customer";

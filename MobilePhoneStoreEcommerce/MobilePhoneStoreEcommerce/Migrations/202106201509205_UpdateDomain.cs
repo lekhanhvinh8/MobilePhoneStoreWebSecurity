@@ -9,7 +9,7 @@
         {
             AddColumn("dbo.Accounts", "NumberError", c => c.Int(nullable: false));
             AddColumn("dbo.Accounts", "Status", c => c.Boolean(nullable: false));
-            DropColumn("dbo.Accounts", "NumError");
+            
         }
         
         public override void Down()

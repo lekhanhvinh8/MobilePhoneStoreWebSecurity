@@ -17,10 +17,11 @@ namespace MobilePhoneStoreEcommerce.Controllers
         {
             this._accountAuthentication = accountAuthentication;
         }
+
         public ActionResult Index()
         {
             if (!IsAuthorized())
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return RedirectToAction("Login", "Account", new { roleID = RoleIds.Admin});
 
             return View();
         }
